@@ -1,0 +1,18 @@
+[06/05/26, 7:43:54 PM] Prathamesh_Malu: sudo update-alternatives --config javac
+sudo apt install openjdk-8-jdk
+[06/05/26, 8:36:29 PM] Prathamesh_Malu: Assignment 1, 
+ServerIntrface : extends Remote, defines the addition method 
+rmi.server.* ServerImpl extends UnicastRemoteObject
+server.java Naming.bind
+client.java Naming.lookup with server url, rmi://localhost/Server
+[07/05/26, 6:48:56 AM] Prathamesh_Malu: Assignment webservice
+new project, glass fish
+new web services, javaweb webapplication
+   add operation
+   click on build, then deploy, then test web service
+new project as webServiceClient
+edit it’s index.html
+have form action=“UniqueName”
+then 2* input type = text
+input type = submit name should match the params
+Create new servlet , name same as UniqueName, clean and build deploy with checkbox, add the methods, edit servlet.java file

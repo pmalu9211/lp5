@@ -1,0 +1,27 @@
+import java.rmi.*;
+import java.rmi.server.*;
+
+public class ServerImpl extends UnicastRemoteObject implements ServerIntf {
+
+    public ServerImpl() throws RemoteException {
+
+    }
+
+    public int countVowels(String word) throws RemoteException {
+
+        int count = 0;
+
+        word = word.toLowerCase();
+
+        for(int i = 0; i < word.length(); i++) {
+
+            char ch = word.charAt(i);
+
+            if(ch == 'a' || ch == 'e' || ch == 'i' || ch == 'o' || ch == 'u') {
+                count++;
+            }
+        }
+
+        return count;
+    }
+}

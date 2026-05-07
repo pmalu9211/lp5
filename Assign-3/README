@@ -1,0 +1,782 @@
+echo $MPJ_HOME
+mpjrun.sh
+ls $MPJ_HOME/lib/mpj.jar
+export MPJ_HOME="$(pwd)/mpj-v0.44"
+export PATH="$MPJ_HOME/bin:$PATH"
+# 1. Set the variables (Notice: NO spaces around the = or : )
+export MPJ_HOME="$(pwd)/mpj-v0_44"
+export PATH="$MPJ_HOME/bin:$PATH"
+
+# 2. Compile the code (Using the method from your notes)
+javac -cp $MPJ_HOME/lib/mpj.jar PracMPI.java
+
+# 3. Run the code with 4 processes
+mpjrun.sh -np 4 PracMPI
+
+# Assignment 3: Parallel Computing with MPI (MPJ Express)
+
+## Project Overview
+This assignment demonstrates the implementation of **Parallel and Distributed Computing** using the **Message Passing Interface (MPI)** standard. Using **MPJ Express** (the Java implementation of MPI), the project showcases how complex computational tasks can be decomposed and executed simultaneously across multiple processes to achieve high-performance results.
+
+## Key Architecture & Workflow
+The implementation follows a **Master-Worker (Root-Process)** architecture:
+1.  **Workload Distribution (Scatter):** The Root process (Rank 0) partitions a large dataset (e.g., an array) and distributes equal chunks to all available worker processes.
+2.  **Parallel Computation:** Each process independently calculates results (Sum, Product, Average, or Reciprocals) on its assigned data chunk.
+3.  **Result Aggregation (Gather):** The Root process collects partial results from all workers and aggregates them into the final output.
+
+## Technical Highlights
+*   **Scalability:** The system is designed to scale across multiple cores or separate physical machines.
+*   **Efficiency:** Utilizing `Scatter` and `Gather` reduces communication overhead compared to manual loop-based distribution.
+*   **Data Integrity:** Implements precise chunking logic ensuring datasets are perfectly balanced across the process size.
+
+---
+
+# MPI / MPJ Express Viva Questions & Answers
+
+# Basic MPI Questions
+
+## 1. What is MPI?
+
+MPI (Message Passing Interface) is a standard used for communication between multiple processes in parallel and distributed computing.
+
+---
+
+## 2. What is MPJ Express?
+
+MPJ Express is the Java implementation of MPI used for parallel programming in Java.
+
+---
+
+## 3. Why is MPI used?
+
+MPI is used to:
+
+* perform parallel processing
+* improve execution speed
+* divide workload among processors
+* support distributed computing
+
+---
+
+## 4. What is parallel computing?
+
+Executing multiple tasks simultaneously using multiple processors/processes.
+
+---
+
+## 5. Difference between sequential and parallel execution?
+
+| Sequential         | Parallel                      |
+| ------------------ | ----------------------------- |
+| One task at a time | Multiple tasks simultaneously |
+| Slower             | Faster                        |
+| Single processor   | Multiple processors           |
+
+---
+
+# Core Code Questions
+
+## 6. What does this line do?
+
+```java id="mqa1"
+MPI.Init(args);
+```
+
+Initializes MPI environment and starts communication among processes.
+
+---
+
+## 7. Why is `MPI.Finalize()` used?
+
+```java id="mqa2"
+MPI.Finalize();
+```
+
+It terminates MPI environment and releases resources.
+
+---
+
+## 8. What is `MPI.COMM_WORLD`?
+
+Default communicator containing all processes participating in execution.
+
+---
+
+## 9. What is Rank?
+
+```java id="mqa3"
+int rank = MPI.COMM_WORLD.Rank();
+```
+
+Rank is the unique ID of each process.
+
+Example:
+
+```text id="mqa4"
+0,1,2,3
+```
+
+---
+
+## 10. What is Size?
+
+```java id="mqa5"
+int size = MPI.COMM_WORLD.Size();
+```
+
+Returns total number of processes.
+
+---
+
+# Scatter Questions
+
+## 11. What is Scatter?
+
+Scatter distributes chunks of data from root process to all processes.
+
+---
+
+## 12. Explain this line:
+
+```java id="mqa6"
+MPI.COMM_WORLD.Scatter(send, 0, chunkSize, MPI.INT, recv, 0, chunkSize, MPI.INT, 0);
+```
+
+It divides array from root process and sends equal chunks to all processes.
+
+---
+
+## 13. Why is Scatter used?
+
+To divide workload equally among processes.
+
+---
+
+## 14. What is root process?
+
+Main controlling process, usually rank 0.
+
+---
+
+## 15. Why only root initializes array?
+
+Because root distributes data to all worker processes.
+
+---
+
+# Gather Questions
+
+## 16. What is Gather?
+
+Gather collects results from all processes to root process.
+
+---
+
+## 17. Why is Gather used?
+
+To combine local results into final output.
+
+---
+
+## 18. Explain Gather syntax.
+
+```java id="mqa7"
+MPI.COMM_WORLD.Gather(sendbuf, sendoffset, sendcount, datatype,
+recvbuf, recvoffset, recvcount, datatype, root);
+```
+
+It collects data from all processes to root.
+
+---
+
+# Array Questions
+
+## 19. Why must `n` be divisible by `size`?
+
+Because equal chunks must be distributed to all processes.
+
+Example:
+
+```java id="mqa8"
+int n = 8;
+```
+
+Works with:
+
+```text id="mqa9"
+size = 2 or 4
+```
+
+Not with:
+
+```text id="mqa10"
+size = 3
+```
+
+---
+
+## 20. What is chunkSize?
+
+```java id="mqa11"
+int chunkSize = n / size;
+```
+
+Number of elements assigned to each process.
+
+---
+
+# Sum Program Viva
+
+## 21. What does Sum MPI program do?
+
+Each process computes sum of its assigned chunk.
+
+---
+
+## 22. Expected output?
+
+```text id="mqa12"
+Process 0 Sum: 3
+Process 1 Sum: 7
+Process 2 Sum: 11
+Process 3 Sum: 15
+```
+
+---
+
+## 23. How is work divided?
+
+Using Scatter.
+
+---
+
+# Multiplication Program Viva
+
+## 24. What does multiplication MPI program do?
+
+Each process computes product of its assigned chunk.
+
+---
+
+## 25. Why initialize product with 1?
+
+Because multiplication identity element is 1.
+
+---
+
+# Average Program Viva
+
+## 26. How is average calculated?
+
+1. Each process computes local average
+2. Gather averages at root
+3. Root computes final average
+
+---
+
+## 27. Why use double datatype?
+
+Average may contain decimal values.
+
+---
+
+## 28. What is local average?
+
+Average computed by each process on its own chunk.
+
+---
+
+# Reciprocal Program Viva
+
+## 29. What is reciprocal?
+
+```text id="mqa13"
+1 / number
+```
+
+Example:
+
+```text id="mqa14"
+1/2 = 0.5
+```
+
+---
+
+## 30. What does reciprocal MPI program do?
+
+Each process computes reciprocals of assigned elements.
+
+---
+
+# Execution Questions
+
+## 31. Compile command?
+
+```bash id="mqa15"
+javac -cp .:$MPJ_HOME/lib/mpj.jar PracMPI.java
+```
+
+---
+
+## 32. Run command?
+
+```bash id="mqa16"
+mpjrun.sh -np 4 PracMPI
+```
+
+---
+
+## 33. What does `-np 4` mean?
+
+Runs 4 parallel processes.
+
+---
+
+# Technical Questions
+
+## 34. Difference between process and thread?
+
+| Process                    | Thread                 |
+| -------------------------- | ---------------------- |
+| Independent execution unit | Lightweight subprocess |
+| Separate memory            | Shared memory          |
+
+---
+
+## 35. What is distributed computing?
+
+Multiple systems/processors working together on a problem.
+
+---
+
+## 36. What is message passing?
+
+Processes communicate by sending/receiving messages.
+
+---
+
+## 37. Why MPI instead of threads?
+
+MPI works across multiple machines.
+
+---
+
+## 38. Can MPI work on one machine?
+
+Yes.
+
+---
+
+## 39. Can MPI work on multiple machines?
+
+Yes, mainly designed for distributed systems.
+
+---
+
+# Error-Based Viva Questions
+
+## 40. What happens if `MPI.Init()` is not called?
+
+MPI communication fails.
+
+---
+
+## 41. What happens if `MPI.Finalize()` is missing?
+
+Resources may not be released properly.
+
+---
+
+## 42. What happens if `n` is not divisible by `size`?
+
+Unequal distribution and incorrect execution.
+
+---
+
+## 43. Why do we use arrays?
+
+To distribute data among processes.
+
+---
+
+# Random Array Questions
+
+## 44. Why use Random class?
+
+To generate random numbers dynamically.
+
+---
+
+## 45. What is the purpose of root process?
+
+* Initialize array
+* Distribute data
+* Collect results
+
+---
+
+# Important Definitions
+
+| Term               | Definition                        |
+| ------------------ | --------------------------------- |
+| MPI                | Message Passing Interface         |
+| Rank               | Unique process ID                 |
+| Size               | Total processes                   |
+| Scatter            | Distribute data                   |
+| Gather             | Collect data                      |
+| Root Process       | Main controlling process          |
+| Parallel Computing | Simultaneous execution            |
+| Distributed System | Multiple systems working together |
+
+---
+
+# Most Important Viva Questions
+
+## 46. Why is MPI called Message Passing Interface?
+
+Because processes communicate by exchanging messages.
+
+---
+
+## 47. Why use Scatter instead of loop distribution?
+
+Scatter automatically distributes equal chunks efficiently.
+
+---
+
+## 48. Why use Gather?
+
+To combine results from all processes.
+
+---
+
+## 49. Why is rank important?
+
+Each process behaves differently based on rank.
+
+---
+
+## 50. Difference between MPI and RMI?
+
+| MPI                        | RMI                      |
+| -------------------------- | ------------------------ |
+| Parallel computing         | Remote method calling    |
+| Message passing            | Object invocation        |
+| High performance computing | Distributed applications |
+
+---
+
+# Examiner Trap Questions
+
+## 51. Can two processes have same rank?
+
+No.
+
+---
+
+## 52. Which process is root by default?
+
+Rank 0.
+
+---
+
+## 53. Why use distributed systems?
+
+* scalability
+* speed
+* fault tolerance
+
+---
+
+## 54. What is scalability?
+
+Ability to handle increasing workload.
+
+---
+
+## 55. What is synchronization?
+
+Coordination among processes.
+
+---
+
+## 56. What is concurrency?
+
+Multiple computations happening simultaneously.
+
+---
+
+# One-Line Answers
+
+* **Scatter** → distributes data.
+* **Gather** → collects data.
+* **Rank** → process ID.
+* **Size** → number of processes.
+* **MPI.Init()** → starts MPI environment.
+* **MPI.Finalize()** → ends MPI environment.
+* **Root Process** → main process.
+* **Parallel Computing** → simultaneous execution.
+
+---
+
+# MOST IMPORTANT LAST-MINUTE QUESTIONS
+
+Prepare these perfectly:
+
+1. MPI lifecycle
+2. Scatter and Gather
+3. Rank and Size
+4. Why `n` divisible by `size`
+5. Root process role
+6. Difference between MPI and Threads
+7. Difference between MPI and RMI
+8. Message passing concept
+9. Parallel vs Distributed computing
+10. Complete execution flow of your code
+
+# 1. MPI Lifecycle
+
+MPI program execution follows these steps:
+
+1. Initialize MPI environment
+
+```java id="l1"
+MPI.Init(args);
+```
+
+2. Get process rank and size
+
+```java id="l2"
+MPI.COMM_WORLD.Rank();
+MPI.COMM_WORLD.Size();
+```
+
+3. Perform communication/computation
+
+* Scatter
+* Gather
+* Send/Receive
+* Calculation
+
+4. Finalize MPI
+
+```java id="l3"
+MPI.Finalize();
+```
+
+---
+
+# 2. Scatter and Gather
+
+## Scatter
+
+Scatter distributes data from root process to all processes.
+
+Example:
+
+```text id="l4"
+Array = [1 2 3 4 5 6 7 8]
+```
+
+With 4 processes:
+
+```text id="l5"
+P0 → [1 2]
+P1 → [3 4]
+P2 → [5 6]
+P3 → [7 8]
+```
+
+Code:
+
+```java id="l6"
+MPI.COMM_WORLD.Scatter(...)
+```
+
+---
+
+## Gather
+
+Gather collects results from all processes back to root process.
+
+Example:
+
+```text id="l7"
+P0 → 3
+P1 → 7
+P2 → 11
+P3 → 15
+```
+
+Root gathers:
+
+```text id="l8"
+[3 7 11 15]
+```
+
+Code:
+
+```java id="l9"
+MPI.COMM_WORLD.Gather(...)
+```
+
+---
+
+# 3. Rank and Size
+
+## Rank
+
+Unique ID assigned to each process.
+
+Example:
+
+```text id="l10"
+0,1,2,3
+```
+
+Code:
+
+```java id="l11"
+int rank = MPI.COMM_WORLD.Rank();
+```
+
+---
+
+## Size
+
+Total number of processes running.
+
+Code:
+
+```java id="l12"
+int size = MPI.COMM_WORLD.Size();
+```
+
+Example:
+
+```text id="l13"
+size = 4
+```
+
+---
+
+# 4. Why `n` Must Be Divisible by `size`
+
+Because Scatter distributes equal chunks to all processes.
+
+Example:
+
+```java id="l14"
+int n = 8;
+```
+
+If:
+
+```text id="l15"
+size = 4
+```
+
+then:
+
+```text id="l16"
+chunkSize = 2
+```
+
+Each process gets equal data.
+
+But:
+
+```text id="l17"
+8 / 3
+```
+
+is unequal.
+
+So distribution becomes incorrect.
+
+---
+
+# 5. Root Process Role
+
+Root process is usually process with rank 0.
+
+Responsibilities:
+
+1. Initialize array/data
+2. Distribute data using Scatter
+3. Collect results using Gather
+4. Display final output
+
+Example:
+
+```java id="l18"
+if(rank == 0)
+```
+
+---
+
+# 6. Difference Between MPI and Threads
+
+| MPI                           | Threads                       |
+| ----------------------------- | ----------------------------- |
+| Uses processes                | Uses threads                  |
+| Separate memory               | Shared memory                 |
+| Works on multiple machines    | Usually same machine          |
+| Message passing communication | Shared variable communication |
+| Used in distributed computing | Used in parallel programming  |
+
+---
+
+# 7. Difference Between MPI and RMI
+
+| MPI                       | RMI                              |
+| ------------------------- | -------------------------------- |
+| Message Passing Interface | Remote Method Invocation         |
+| Parallel processing       | Remote object communication      |
+| Used in HPC               | Used in distributed applications |
+| Process communication     | Method invocation                |
+| Focus on computation      | Focus on services                |
+
+---
+
+# 8. Message Passing Concept
+
+Processes communicate by sending and receiving messages.
+
+Instead of shared memory:
+
+* one process sends data
+* another receives data
+
+MPI provides:
+
+* Scatter
+* Gather
+* Send
+* Receive
+
+for message passing.
+
+---
+
+# 9. Parallel vs Distributed Computing
+
+| Parallel Computing                     | Distributed Computing                   |
+| -------------------------------------- | --------------------------------------- |
+| Multiple tasks executed simultaneously | Multiple systems work together          |
+| Usually same machine                   | Multiple machines                       |
+| Shared memory possible                 | Message passing used                    |
+| Focus on speed                         | Focus on scalability & resource sharing |
+
+---
+
+# Important One-Line Viva Answers
+
+* **Scatter** → distributes data.
+* **Gather** → collects data.
+* **Rank** → process ID.
+* **Size** → total processes.
+* **Root Process** → controlling process.
+* **MPI** → message passing system.
+* **Parallel Computing** → simultaneous execution.
+* **Distributed Computing** → multiple systems working together.
